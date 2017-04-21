@@ -16,13 +16,13 @@
 **
 **  Target      : STMicroelectronics STM32
 **
-**  Distribution: The file is distributed “as is,? without any warranty
+**  Distribution: The file is distributed ï¿½as is,? without any warranty
 **                of any kind.
 **
 *****************************************************************************
 ** @attention
 **
-** <h2><center>&copy; COPYRIGHT(c) 2017 Ac6</center></h2>
+** <h2><center>&copy; COPYRIGHT(c) 2014 Ac6</center></h2>
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -53,16 +53,16 @@
 ENTRY(Reset_Handler)
 
 /* Highest address of the user mode stack */
-_estack = 0x20018000;    /* end of RAM */
+_estack = 0x2000C000;    /* end of RAM */
 
 _Min_Heap_Size = 0;      /* required amount of heap  */
-_Min_Stack_Size = 0x400; /* required amount of stack */
+_Min_Stack_Size = 0x800; /* required amount of stack */
 
 /* Memories definition */
 MEMORY
 {
-  RAM (xrw)		: ORIGIN = 0x20000000, LENGTH = 96K
-  ROM (rx)		: ORIGIN = 0x8000000, LENGTH = 768K
+  RAM (xrw)		: ORIGIN = 0x20000000, LENGTH = 48K
+  ROM (rx)		: ORIGIN = 0x8000000, LENGTH = 512K
 }
 
 /* Sections */
@@ -88,6 +88,24 @@ SECTIONS
 
     KEEP (*(.init))
     KEEP (*(.fini))
+    
+        /* section information for finsh shell */
+    . = ALIGN(4);
+    __fsymtab_start = .;
+    KEEP(*(FSymTab))
+    __fsymtab_end = .;
+    . = ALIGN(4);
+    __vsymtab_start = .;
+    KEEP(*(VSymTab))
+    __vsymtab_end = .;
+    . = ALIGN(4);
+
+    /* section information for initial. */
+    . = ALIGN(4);
+    __rt_init_start = .;
+    KEEP(*(SORT(.rti_fn*)))
+    __rt_init_end = .;
+    . = ALIGN(4);
 
     . = ALIGN(4);
     _etext = .;        /* define a global symbols at end of code */
@@ -188,7 +206,7 @@ SECTIONS
     . = ALIGN(8);
   } >RAM
 
-  
+  __bss_end = .;
 
   /* Remove information from the compiler libraries */
   /DISCARD/ :
